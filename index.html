@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화담숲 관람 코스 안내도</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d5016;
+            font-size: 2em;
+            margin-bottom: 10px;
+            white-space: nowrap;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 15px;
+            border: 3px solid #4caf50;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .location {
+            position: absolute;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 2px solid;
+        }
+        
+        .location:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        
+        .entrance { 
+            top: 520px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #ff5722; 
+            color: white;
+            border-color: #d84315;
+            font-size: 1.1em;
+        }
+        
+        .monorail1 { 
+            top: 480px; 
+            left: 100px; 
+            background: #ff9800;
+            border-color: #f57c00;
+        }
+        
+        .observatory { 
+            top: 60px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #2196f3;
+            color: white;
+            border-color: #1976d2;
+        }
+        
+        .moss { 
+            top: 150px; 
+            right: 120px; 
+            background: #4caf50;
+            color: white;
+            border-color: #388e3c;
+        }
+        
+        .hydrangea { 
+            top: 250px; 
+            right: 150px; 
+            background: #9c27b0;
+            color: white;
+            border-color: #7b1fa2;
+        }
+        
+        .pine { 
+            top: 350px; 
+            right: 100px; 
+            background: #00796b;
+            color: white;
+            border-color: #004d40;
+        }
+        
+        .monet { 
+            top: 420px; 
+            right: 180px; 
+            background: #e91e63;
+            color: white;
+            border-color: #c2185b;
+        }
+        
+        .maple { 
+            top: 480px; 
+            right: 80px; 
+            background: #ff5722;
+            color: white;
+            border-color: #d84315;
+        }
+        
+        .pond { 
+            top: 450px; 
+            left: 80px; 
+            background: #03a9f4;
+            color: white;
+            border-color: #0288d1;
+        }
+        
+        .monorail-line {
+            position: absolute;
+            width: 4px;
+            background: linear-gradient(180deg, #ff9800, #f57c00);
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+        }
+        
+        .path {
+            position: absolute;
+            height: 3px;
+            background: repeating-linear-gradient(
+                90deg,
+                #8bc34a,
+                #8bc34a 10px,
+                transparent 10px,
+                transparent 20px
+            );
+        }
+        
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .legend-title {
+            font-size: 1.3em;
+            color: #2d5016;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .path-legend {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .path-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .path-sample {
+            width: 60px;
+            height: 4px;
+        }
+        
+        .path-solid {
+            background: linear-gradient(90deg, #ff9800, #f57c00);
+            border-radius: 2px;
+        }
+        
+        .path-dashed {
+            background: repeating-linear-gradient(
+                90deg,
+                #8bc34a,
+                #8bc34a 8px,
+                transparent 8px,
+                transparent 16px
+            );
+            height: 3px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin-right: 12px;
+            border: 2px solid #ddd;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border-left: 5px solid #ff9800;
+        }
+        
+        .info-box h3 {
+            color: #e65100;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .info-box li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .season-tips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .season-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            transition: transform 0.3s;
+        }
+        
+        .season-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .season-card h4 {
+            color: #2d5016;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .spring { border-color: #e91e63; }
+        .summer { border-color: #9c27b0; }
+        .autumn { border-color: #ff5722; }
+        .winter { border-color: #2196f3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌳 화담숲 관람 코스 안내도 🌳</h1>
+        <p class="subtitle">클릭하면 각 포토존의 상세 정보를 확인할 수 있습니다</p>
+        
+        <div class="map-container">
+            <!-- 모노레일 라인 표시 -->
+            <div class="monorail-line" style="top: 80px; left: 150px; height: 400px; transform: rotate(15deg);"></div>
+            
+            <!-- 산책로 표시 -->
+            <div class="path" style="top: 180px; left: 50%; width: 400px; transform: translateX(-50%) rotate(-20deg);"></div>
+            <div class="path" style="top: 380px; left: 40%; width: 350px; transform: translateX(-50%) rotate(10deg);"></div>
+            
+            <!-- 각 포토존 위치 -->
+            <div class="location entrance" onclick="showInfo('entrance')">
+                📍 입구/매표소
+            </div>
+            <div class="location monorail1" onclick="showInfo('monorail')">
+                🚠 모노레일 1승강장
+            </div>
+            <div class="location observatory" onclick="showInfo('observatory')">
+                🏔️ 전망대
+            </div>
+            <div class="location moss" onclick="showInfo('moss')">
+                🌿 이끼원
+            </div>
+            <div class="location hydrangea" onclick="showInfo('hydrangea')">
+                💜 수국정원
+            </div>
+            <div class="location pine" onclick="showInfo('pine')">
+                🌲 소나무정원
+            </div>
+            <div class="location monet" onclick="showInfo('monet')">
+                🌷 모네정원
+            </div>
+            <div class="location maple" onclick="showInfo('maple')">
+                🍁 단풍나무원
+            </div>
+            <div class="location pond" onclick="showInfo('pond')">
+                🦆 원앙연못
+            </div>
+        </div>
+        
+        <div id="infoDisplay" class="info-box">
+            <h3>👆 위 지도의 포토존을 클릭해보세요!</h3>
+            <p>각 포토존의 특징과 촬영 팁을 확인할 수 있습니다.</p>
+        </div>
+        
+        <div class="path-legend">
+            <div class="path-legend-item">
+                <div class="path-sample path-solid"></div>
+                <span><strong>주황 실선:</strong> 모노레일 노선</span>
+            </div>
+            <div class="path-legend-item">
+                <div class="path-sample path-dashed"></div>
+                <span><strong>초록 점선:</strong> 도보 산책로</span>
+            </div>
+        </div>
+        
+        <div class="legend-title">📌 포토존 카테고리</div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff5722;"></div>
+                <span><strong>입구/출구</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff9800;"></div>
+                <span><strong>모노레일 승강장</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2196f3;"></div>
+                <span><strong>전망 포인트</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4caf50;"></div>
+                <span><strong>사계절 포토존</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #9c27b0;"></div>
+                <span><strong>여름 추천</strong></span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e91e63;"></div>
+                <span><strong>봄 추천</strong></span>
+            </div>
+        </div>
+        
+        <div class="season-tips">
+            <div class="season-card spring">
+                <h4>🌸 봄 (3-5월)</h4>
+                <p><strong>Best:</strong> 모네정원 튤립</p>
+                <p><strong>시기:</strong> 4월 중순</p>
+                <p>30만 본의 화려한 튤립과 벚꽃길이 절정을 이룹니다.</p>
+            </div>
+            <div class="season-card summer">
+                <h4>☀️ 여름 (6-8월)</h4>
+                <p><strong>Best:</strong> 수국정원</p>
+                <p><strong>시기:</strong> 6월 하순-7월</p>
+                <p>100여 품종 7만여 본의 수국이 만개하는 장관을 볼 수 있습니다.</p>
+            </div>
+            <div class="season-card autumn">
+                <h4>🍂 가을 (10-11월)</h4>
+                <p><strong>Best:</strong> 단풍나무원</p>
+                <p><strong>시기:</strong> 10월 중순-11월 초</p>
+                <p>400여 품종의 단풍과 모노레일의 환상적인 조합이 압권입니다.</p>
+            </div>
+            <div class="season-card winter">
+                <h4>❄️ 겨울 (12-2월)</h4>
+                <p><strong>Best:</strong> 소나무정원</p>
+                <p><strong>시기:</strong> 눈 온 날</p>
+                <p>눈 덮인 소나무와 이끼원의 고즈넉한 설경이 아름답습니다.</p>
+            </div>
+        </div>
+        
+        <div class="info-box" style="margin-top: 30px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+            <h3>📋 관람 정보</h3>
+            <ul>
+                <li><strong>소요시간:</strong> 모노레일 이용 시 2-2.5시간 / 도보 전체 3-3.5시간</li>
+                <li><strong>운영시간:</strong> 09:00-18:00 (입장마감 17:00)</li>
+                <li><strong>휴원일:</strong> 매주 월요일</li>
+                <li><strong>입장료:</strong> 성인 11,000원 (모노레일 별도)</li>
+                <li><strong>주소:</strong> 경기 광주시 도척면 도척윗로 278-1</li>
+                <li><strong>주차:</strong> 화담숲 또는 곤지암리조트로 네비 검색</li>
+                <li><strong>Tip:</strong> 성수기(봄 튤립, 가을 단풍)에는 온라인 사전예약 필수!</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const infoData = {
+            entrance: {
+                title: '📍 입구 / 매표소',
+                content: `
+                    <p><strong>화담숲의 시작점</strong></p>
+                    <ul>
+                        <li>매표소에서 입장권 구매 및 모노레일 탑승권 구매</li>
+                        <li>오른쪽에 카페&베이커리 seed green, 편의점 위치</li>
+                        <li>물품보관함도 이용 가능 (1,000원)</li>
+                        <li><strong>촬영 팁:</strong> 입구의 화담숲 간판 앞에서 기념촬영 필수!</li>
+                    </ul>
+                `
+            },
+            monorail: {
+                title: '🚠 모노레일',
+                content: `
+                    <p><strong>화담숲의 시그니처 포토존</strong></p>
+                    <ul>
+                        <li>전체 1.2km 순환선, 약 20분 운행</li>
+                        <li>1승강장(입구)에서 탑승 → 2승강장(정상)에서 하차</li>
+                        <li>가을 단풍 시즌에 가장 아름다운 풍경 연출</li>
+                        <li><strong>촬영 팁:</strong> 모노레일 내부에서 창밖 풍경 촬영, 또는 아래에서 지나가는 모노레일을 연속촬영!</li>
+                        <li><strong>Best 시즌:</strong> 가을 (10-11월)</li>
+                    </ul>
+                `
+            },
+            observatory: {
+                title: '🏔️ 전망대',
+                content: `
+                    <p><strong>화담숲 전체를 조망하는 최고의 뷰포인트</strong></p>
+                    <ul>
+                        <li>화담숲 정상에 위치한 전망 데크</li>
+                        <li>화담숲 전체와 주변 산세를 한눈에 감상</li>
+                        <li>가을철 붉게 물든 산과 숲의 파노라마 뷰</li>
+                        <li><strong>촬영 팁:</strong> 전망대 난간에 기대어 뒷모습 촬영 또는 전신샷 추천</li>
+                        <li><strong>Best 시즌:</strong> 가을 (단풍), 봄 (신록)</li>
+                    </ul>
+                `
+            },
+            moss: {
+                title: '🌿 이끼원',
+                content: `
+                    <p><strong>사계절 푸른 신비로운 공간</strong></p>
+                    <ul>
+                        <li>다양한 종류의 이끼로 뒤덮인 자연 정원</li>
+                        <li>겨울에도 푸른 생명력을 유지하는 유일한 공간</li>
+                        <li>습한 환경이 만들어내는 신비로운 분위기</li>
+                        <li><strong>촬영 팁:</strong> 클로즈업으로 이끼의 디테일 담기, 눈 온 날의 대비가 아름다움</li>
+                        <li><strong>Best 시즌:</strong> 사계절 (특히 겨울)</li>
+                    </ul>
+                `
+            },
+            hydrangea: {
+                title: '💜 수국정원',
+                content: `
+                    <p><strong>여름 화담숲의 절대 하이라이트</strong></p>
+                    <ul>
+                        <li>100여 품종, 7만여 본의 수국이 만개</li>
+                        <li>파란색, 분홍색 수국이 만들어내는 물결</li>
+                        <li>수국 사이로 난 오솔길이 포토존</li>
+                        <li><strong>촬영 팁:</strong> 흐린 날이나 비 온 직후가 색이 더욱 선명, 수국 클로즈업도 잊지 마세요</li>
+                        <li><strong>Best 시즌:</strong> 여름 (6월 하순-7월)</li>
+                    </ul>
+                `
+            },
+            pine: {
+                title: '🌲 소나무정원',
+                content: `
+                    <p><strong>한국의 전통미가 살아있는 공간</strong></p>
+                    <ul>
+                        <li>수령 높은 소나무들이 줄지어 선 정원</li>
+                        <li>겨울 설경과 가장 잘 어울리는 곳</li>
+                        <li>동양화 같은 고즈넉한 분위기</li>
+                        <li><strong>촬영 팁:</strong> 소나무 사이로 보이는 하늘 담기, 눈 온 날 한복 입고 촬영 추천</li>
+                        <li><strong>Best 시즌:</strong> 겨울 (눈 온 날)</li>
+                    </ul>
+                `
+            },
+            monet: {
+                title: '🌷 모네정원',
+                content: `
+                    <p><strong>봄 화담숲의 절대 하이라이트</strong></p>
+                    <ul>
+                        <li>약 30만 본의 형형색색 튤립이 융단처럼 펼쳐짐</li>
+                        <li>마치 유럽의 정원에 온 듯한 느낌</li>
+                        <li>다양한 색상의 튤립이 층층이 심어져 있음</li>
+                        <li><strong>촬영 팁:</strong> 오전 10시-오후 2시 사이가 가장 아름다움, 역광으로 찍으면 꽃잎이 투명하게 빛남</li>
+                        <li><strong>Best 시즌:</strong> 봄 (4월 중순)</li>
+                    </ul>
+                `
+            },
+            maple: {
+                title: '🍁 단풍나무원',
+                content: `
+                    <p><strong>가을 화담숲의 대표 포토존</strong></p>
+                    <ul>
+                        <li>400여 품종의 단풍나무가 일제히 붉게 물듦</li>
+                        <li>내장단풍, 당단풍, 털단풍, 노르웨이단풍 등 다양한 품종</li>
+                        <li>메타세쿼이아 길의 붉은 터널이 압권</li>
+                        <li><strong>촬영 팁:</strong> 역광으로 찍으면 단풍이 더욱 투명하고 아름다움, 낙엽 쌓인 데크길에서 위를 올려다보는 앵글 추천</li>
+                        <li><strong>Best 시즌:</strong> 가을 (10월 중순-11월 초)</li>
+                    </ul>
+                `
+            },
+            pond: {
+                title: '🦆 원앙연못',
+                content: `
+                    <p><strong>고요한 수변 포토존</strong></p>
+                    <ul>
+                        <li>화담숲 입구 오른편에 위치한 연못</li>
+                        <li>여름철 수련과 연꽃이 피어남</li>
+                        <li>연못에 비친 하늘과 나무들의 반영이 아름다움</li>
+                        <li><strong>촬영 팁:</strong> 연못 반영 사진, 연못 주변 벤치에 앉아 쉬면서 찍는 인물 사진 추천</li>
+                        <li><strong>Best 시즌:</strong> 여름 (연꽃), 가을 (단풍 반영)</li>
+                    </ul>
+                `
+            }
+        };
+        
+        function showInfo(location) {
+            const info = infoData[location];
+            const display = document.getElementById('infoDisplay');
+            display.innerHTML = `
+                <h3>${info.title}</h3>
+                ${info.content}
+            `;
+            display.style.animation = 'none';
+            setTimeout(() => {
+                display.style.animation = 'fadeIn 0.5s';
+            }, 10);
+        }
+    </script>
+    
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</body>
+</html>
